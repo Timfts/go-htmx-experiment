@@ -22,24 +22,94 @@ func newTemplate() *Templates {
 	}
 }
 
-type Count struct {
-	Count int
+type Contact struct {
+	Name  string
+	Email string
+}
+
+func newContact(name string, email string) Contact {
+	return Contact{
+		Name:  name,
+		Email: email,
+	}
+}
+
+type Data struct {
+	Contacts []Contact
+}
+
+func newData() Data {
+	return Data{
+		Contacts: []Contact{
+			newContact("Tonho", "tonhao_sk8@yahoo.com.br"),
+			newContact("Beto", "betao_iron_maiden@hotmail.com.br"),
+			newContact("Lulu", "lulu_da_batata@bol.com.br"),
+		},
+	}
+}
+
+func (d Data) hasEmail(email string) bool {
+	for _, contact := range d.Contacts {
+		if contact.Email == email {
+			return true
+		}
+	}
+
+	return false
+}
+
+type FormData struct {
+	Values map[string]string
+	Errors map[string]string
+}
+
+type Page struct {
+	Data Data
+	Form FormData
+}
+
+func newPage() Page {
+	return Page{
+		Data: newData(),
+		Form: newFormData(),
+	}
+}
+
+func newFormData() FormData {
+	return FormData{
+		Values: make(map[string]string),
+		Errors: make(map[string]string),
+	}
 }
 
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
-	count := Count{Count: 0}
 	e.Renderer = newTemplate()
+	page := newPage()
 
 	e.GET("/", func(c echo.Context) error {
 
-		return c.Render(200, "index", count)
+		return c.Render(200, "index", page)
 	})
 
-	e.POST("/count", func(c echo.Context) error {
-		count.Count++
-		return c.Render(200, "count", count)
+	e.POST("/contacts", func(c echo.Context) error {
+		name := c.FormValue("name")
+		email := c.FormValue("email")
+
+		if page.Data.hasEmail(email) {
+			formData := newFormData()
+			formData.Values["name"] = name
+			formData.Values["email"] = email
+			formData.Errors["email"] = "Email already exists"
+
+			return c.Render(422, "form", formData)
+		}
+
+		contact := newContact(name, email)
+		page.Data.Contacts = append(page.Data.Contacts, contact)
+		c.Render(200, "form", newFormData())
+		return c.Render(200, "oob-contact", contact)
 
 	})
 

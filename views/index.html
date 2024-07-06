@@ -6,14 +6,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", (event) => {
+            document.body.addEventListener('htmx:beforeSwap', function(evt) {
+                if (evt.detail.xhr.status === 422) {
+                    evt.detail.shouldSwap = true;
+                    evt.detail.isError = false;
+                }
+            });
+        })
+        </script>
   </head>
   <body>
-    <div class="counter-holder">{{ template "count" . }}</div>
-    <button hx-target=".counter-holder" hx-post="/count">increment</button>
+    {{ template "form" .Form }}
+    <hr />
+    {{ template "display" .Data }}
   </body>
 </html>
 {{ end }} 
 
-{{ block "count" . }}
-    <p>Count {{ .Count }}</p>
+{{ block "form" . }}
+<form hx-post="/contacts" hx-swap="outerHTML">
+    Name: <input {{ if .Values.name }} value="{{ .Values.name }}" {{ end }} type="text" name="name" />
+    Email: <input  {{ if .Values.email }} value="{{ .Values.email }}" {{ end }} type="email" name="email" />
+
+    {{ if .Errors.email }}
+        <div style="color:red">{{ .Errors.email }}</div>
+    {{ end}}
+    <button type="submit">Submit</button>
+</form>
+{{ end }}
+
+{{ block "display" . }}
+    <div id="contacts">
+            {{ range .Contacts }}
+                {{ template "contact" . }}
+            {{ end }}
+    </div>
+{{ end }}
+
+{{ block "oob-contact" .}}
+    <div hx-swap-oob="afterbegin" id="contacts">
+        {{ template "contact" .}}
+    </div>
+{{ end }}
+
+{{ block "contact" . }}
+    <div style="display:flex; flex-direction: column;">
+        <p>Name: <span>{{ .Name }}</span></p>
+        <p>Email: <span>{{ .Email }}</span></p>
+    </div>
 {{ end }}
