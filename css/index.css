@@ -1,0 +1,17 @@
+.contact-loading {
+  opacity: 0;
+  transition: opacity 500ms ease-in;
+}
+
+.htmx-request .contact-loading {
+  opacity: 1;
+}
+
+.htmx-request.contact-loading {
+  opacity: 1;
+}
+
+.contact.htmx-swaping {
+  opacity: 0;
+  transition: opacity 500ms ease-in;
+}

@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <link rel="stylesheet" href="/css/index.css" />
     <script src="https://unpkg.com/htmx.org@2.0.0"></script>
     <script>
         document.addEventListener("DOMContentLoaded", (event) => {
@@ -52,8 +53,8 @@
 {{ end }}
 
 {{ block "contact" . }}
-    <div id="contact-{{ .Id }}" style="display:flex; gap:20px; align-items:center; cursor:pointer;">
-        <div hx-target="#contact-{{ .Id }}" hx-swap="outerHTML" hx-delete="/contacts/{{ .Id }}" style="width: 1rem">
+    <div id="contact-{{ .Id }}" class="contact" style="display:flex; gap:20px; align-items:center; cursor:pointer;">
+        <div hx-target="#contact-{{ .Id }}" hx-swap="outerHTML swap:500ms" hx-delete="/contacts/{{ .Id }}" hx-indicator="#ci-{{ .Id }}" style="width: 1rem">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path fill="none" d="M0 0h24v24H0z"/>
                 <path d="M4 2h16a1 1 0 011 1v1a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1zM3 6h18v16a1 1 0 01-1 1H4a1 1 0 01-1-1V6zm3 3v9a1 1 0 002 0v-9a1 1 0 00-2 0zm5 0v9a1 1 0 002 0v-9a1 1 0 00-2 0zm5 0v9a1 1 0 002 0v-9a1 1 0 00-2 0z"/>
@@ -61,5 +62,8 @@
         </div>
         <p>Name: <span>{{ .Name }}</span></p>
         <p>Email: <span>{{ .Email }}</span></p>
+        <div id="ci-{{ .Id }}" class="contact-loading">
+            loading
+        </div>
     </div>
 {{ end }}
